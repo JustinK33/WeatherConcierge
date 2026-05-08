@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from types import SimpleNamespace
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.config import settings
@@ -16,6 +17,19 @@ class AgentManager:
 
     @classmethod
     def build_agent(cls):
+        # If no API key is configured (e.g., in CI or local tests), return
+        # a lightweight mock agent that implements `invoke(state)` so
+        # imports and tests don't require external API credentials.
+        if not settings.GOOGLE_API_KEY:
+            class MockAgent:
+                def invoke(self, state: Dict[str, Any]):
+                    # Return a structure compatible with the code that expects
+                    # {'messages': [<obj with .content>]}
+                    reply = SimpleNamespace(content="(mock) no API key configured; agent disabled")
+                    return {"messages": [reply]}
+
+            return MockAgent()
+
         llm = ChatGoogleGenerativeAI(
             model=settings.AI_MODEL,
             api_key=settings.GOOGLE_API_KEY,
