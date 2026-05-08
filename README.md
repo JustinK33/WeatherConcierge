@@ -51,71 +51,21 @@ uvicorn app.api:app --reload --host 0.0.0.0 --port 8000
 5. Open docs at `http://localhost:8000/docs` to explore the API interactively.
 
 ## Docker
-Build and run the container:
-
-```bash
-docker build -t weather-concierge:latest .
-docker run -e WEATHER_API_KEY=your_openweather_key -e GOOGLE_API_KEY=your_google_key -p 8000:8000 weather-concierge:latest
-```
-
-## Environment Variables
-Use `.env` or environment variables to configure the app. See `.env.example`.
-- `WEATHER_API_KEY` — OpenWeather API key (required for weather tools).
-- `GOOGLE_API_KEY` — Google Generative AI key (optional for local testing if you use a different model or mock).
-- `AI_MODEL` — Optional model name (default configured in `app/config.py`).
-
-## API Examples
-
-Current weather
-
-```bash
-curl -X POST "http://localhost:8000/weather/current" -H "Content-Type: application/json" -d '{"location": {"city": "New York", "country_code": "US"}}'
-```
-
-Chat (conversational)
-
-```bash
-curl -X POST "http://localhost:8000/chat" -H "Content-Type: application/json" -d '{"message": "What's the weather like in Boston today?"}'
-```
-
-## Project layout
-- `app/` — FastAPI app, agent, tools and schemas.
-- `Dockerfile` — Container image for running the service.
-- `requirements.txt` — Python dependencies.
-
-## Architecture (Overview)
-The service follows a modular, production-friendly architecture designed for horizontal scaling and observability:
-
-- **API Layer (FastAPI):** lightweight HTTP + WebSocket endpoints for programmatic and real-time access.
-- **Agent Layer (LangChain + Google Gen-AI):** a specialized weather agent that composes tool calls and LLM responses.
-- **Tooling Layer:** deterministic tools that call external systems (OpenWeather). Tools are pure functions that return structured text and are safe to test.
-- **Session Store:** in-memory session store for demo; replaceable with Redis for persistence and multi-instance support.
-- **Telemetry & Observability:** Prometheus metrics endpoint and request counters for monitoring.
-- **Background Jobs:** scheduled alerts and async tasks for periodic checks (pluggable via Celery / RQ / APScheduler).
-
-Design goals: minimal latency for simple queries, graceful degradation when external APIs fail, and clear separation between LLM logic and deterministic tools so the system is auditable.
-
-## Impressive Features Added
-- Real-time conversational WebSocket chat (`/ws/chat`) enabling interactive sessions and push-style updates.
-- Prometheus metrics (`/metrics`) for request counts and latency, ready for Grafana dashboards.
-- Clear upgrade path to production: Redis-backed sessions, Kubernetes-ready Docker image, horizontal autoscaling, and CI/CD.
-
-## What's included in this update
-- `app/api.py`: WebSocket chat endpoint and metrics mounting.
-- `app/telemetry.py`: Prometheus metrics utilities and middleware.
-- `requirements.txt`: added `prometheus-client`.
-
-
-## Next steps / Ideas to make it more impressive
-- Add an OpenAPI client example and a small demo web UI.
-- Add CI (GitHub Actions) with linting and automated builds.
-- Add unit tests for `app/tools/weather.py` using VCR or HTTP mocking.
-- Add a small demo script that queries the API and prints a nice formatted report.
-
 ## Contributing
 PRs welcome. For major changes, open an issue first to discuss the design.
 
 ## License
+MIT
+
+## Continuous Integration
+This repository includes a GitHub Actions workflow (`.github/workflows/ci.yml`) that:
+
+- Installs dependencies from `requirements.txt`.
+- Byte-compiles the codebase to detect syntax errors.
+- Runs a lightweight FastAPI `TestClient` health check against the `app`.
+- Runs `pytest` if tests are present (non-fatal if none exist).
+
+The CI badge at the top of this README links to the workflow run history.
 MIT# Weather Chat Service API
 
 A FastAPI backend that exposes a weather-focused chat service.  
