@@ -1,9 +1,11 @@
 langchain
 langchain-community
-langchain-openai
-langchain-anthropic
+langchain-google-genai
+google-genai
+langchain-google-vertexai
 requests
 fastapi
 pydantic
 uvicorn[standard]
 python-dotenv
+prometheus-client
