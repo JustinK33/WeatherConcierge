@@ -1,5 +1,7 @@
 # Weather Concierge
 
+[![CI](https://github.com/JustinK33/WeatherConcierge/actions/workflows/ci.yml/badge.svg)](https://github.com/JustinK33/WeatherConcierge/actions/workflows/ci.yml)
+
 A compact, AI-powered weather assistant API that combines LangChain tools with Google’s generative models and OpenWeather for accurate current conditions and short forecasts.
 
 ## Highlights
